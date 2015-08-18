@@ -18,36 +18,38 @@ public class AppTest extends FluentTest {
   @ClassRule
   public static ServerRule server = new ServerRule();
 
+  //test content comes from layout.vtl
   @Test
   public void rootTest() {
       goTo("http://localhost:4567/");
-      assertThat(pageSource()).contains("Task");
+      assertThat(pageSource()).contains("places");
+  }
+
+  @Test
+  public void cityIsCreatedTest() {
+    goTo("http://localhost:4567/");
+    fill("#nameOfCity").with("Portland");
+    submit(".btn");
+    assertThat(pageSource()).contains("Your city has been saved.");
   }
   @Test
-  public void taskIsCreatedTest() {
+  public void cityIsDisplayedTest() {
     goTo("http://localhost:4567/");
-    fill("#description").with("Mow the lawn");
+    fill("#nameOfCity").with("Portland"); //finds form: nameOfCity in index.vtl
     submit(".btn");
-    assertThat(pageSource()).contains("Your task has been saved.");
+    click("a", withText("Go Back"));
+    assertThat(pageSource()).contains("Portland");
   }
   @Test
-  public void taskIsDisplayedTest() {
+  public void multipleCitiesAreDisplayedTest() {
     goTo("http://localhost:4567/");
-    fill("#description").with("Mow the lawn");
+    fill("#nameOfCity").with("Portland");
     submit(".btn");
     click("a", withText("Go Back"));
-    assertThat(pageSource()).contains("Mow the lawn");
-  }
-  @Test
-  public void multipleTasksAreDisplayedTest() {
-    goTo("http://localhost:4567/");
-    fill("#description").with("Mow the lawn");
+    fill("#nameOfCity").with("Atlanta");
     submit(".btn");
     click("a", withText("Go Back"));
-    fill("#description").with("Buy groceries");
-    submit(".btn");
-    click("a", withText("Go Back"));
-    assertThat(pageSource()).contains("Mow the lawn");
-    assertThat(pageSource()).contains("Buy groceries");
+    assertThat(pageSource()).contains("Portland");
+    assertThat(pageSource()).contains("Atlanta");
   }
 }

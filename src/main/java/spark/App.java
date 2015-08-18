@@ -10,43 +10,31 @@ public class App {
     staticFileLocation("/public");
     String layout = "templates/layout.vtl";
 
+
     get("/", (request, response) -> {
       HashMap<String, Object> model = new HashMap<String, Object>();
       model.put("template", "templates/index.vtl");
+      model.put("cities", request.session().attribute("cities"));
       return new ModelAndView(model, layout);
     }, new VelocityTemplateEngine());
 
-    post("/Tasks", (request, response) -> {
+    post("/cities", (request, response) -> {
       HashMap<String, Object> model = new HashMap<String, Object>();
+      ArrayList<City> cities = request.session().attribute("cities");
 
-      String description = request.queryParams("description");
-      Task newTask = new Task(description);
-      request.session().attribute("task");
+      if (cities == null) {
+        cities = new ArrayList<City>();
+        request.session().attribute("cities", cities);
+      }
+
+      String nameOfCity = request.queryParams("nameOfCity");
+      City newCity = new City(nameOfCity);
+      request.session().attribute("nameOfCity", nameOfCity);
+
+      cities.add(newCity);
 
       model.put("template", "templates/success.vtl");
       return new ModelAndView(model, layout);
     }, new VelocityTemplateEngine());
-
-  {
-    post("/task", (request, response) -> {
-  HashMap<String, Object> model = new HashMap<String, Object>();
-
-  ArrayList<Task> task = request.session().attribute("Task");
-
-if (task == null) {
-  task = new ArrayList<Task>();
-  request.session().attribute("task", task);
-}
-
-  String description = request.queryParams("description");
-  Task newTask = new Task(description);
-
-  task.add(newTask);
-
-  model.put("template", "templates/success.vtl");
-
-  return new ModelAndView(model, layout);
- }, new VelocityTemplateEngine());
- }
- }
+  }
  }
